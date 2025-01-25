@@ -1,4 +1,3 @@
-
 cbuffer cb : register(b0)
 {
     float2 resolution;
