@@ -74,6 +74,10 @@ float sdSquare(float2 p, float a)
     return abs(p.x+p.y) + abs(p.x-p.y) - a;
 }
 
+float mod(float x, float y) {
+    return x - y * floor(x / y);
+}
+
 float4 Frag(VsOutput input) : SV_TARGET
 {
     float2 p = (input.uv * 2 - 1) * 0.5;
@@ -83,11 +87,11 @@ float4 Frag(VsOutput input) : SV_TARGET
 
     LogPolar logp = logPolarPolka(p, 11.0);
     logp.uv -= 0.5;
-    logp.uv = mul(logp.uv, rot(pow(frac(t / 4.0 + logp.id.x * 0.1 + logp.id.y * 0.2), 16.0) * acos(-1.0)/2.0));
+    logp.uv = mul(logp.uv, rot(pow(frac(t / 4.0 + logp.id.x * acos(-1.0)*2.0 + logp.id.y * acos(-1.0)*2.0), 16.0) * acos(-1.0)/2.0));
     float s = max(sdAsteroid(logp.uv, 0.01), -sdAsteroid(logp.uv, 0.65));
     s = smoothstep(0.5, 0.4, s);
-    s =  fmod(logp.id.x, 2.0) < 1.0 ? s : smoothstep(0.05, 0.045, sdSquare(mul(logp.uv, rot(acos(-1.0)/4.0)), 0.1));
-    s *= fmod(logp.id.y, 2.0) < 1.0 ? 1.0 : 0.0;
+    s =  mod(logp.id.x, 2.0) < 1.0 ? s : smoothstep(0.05, 0.045, sdSquare(mul(logp.uv, rot(acos(-1.0)/4.0)), 0.1));
+    s *= mod(logp.id.y, 2.0) < 1.0 ? 1.0 : 0.0;
 
     float3 col = s;
     
